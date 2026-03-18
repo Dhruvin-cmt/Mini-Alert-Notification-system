@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import { Alert } from "../models/alertSchema.js";
 
@@ -40,6 +39,12 @@ export const markAsRead = catchAsyncError(async (req, res, next) => {
       runValidators: true,
     }
   );
+
+  res.status(200).json({
+    success: true,
+    message: "Message mark as read!",
+    getMsgAndUpdate,
+  });
 });
 
 export const markAllAsRead = catchAsyncError(async (req, res, next) => {
