@@ -1,11 +1,14 @@
 import express from "express";
-import { getAllAlerts, markAsRead } from "../controller/alertController.js";
+import { deleteMsg, getAllAlerts, markAllAsRead, markAsRead } from "../controller/alertController.js";
 import { isUserAuthenticated } from "../middlewares/auth.js";
 
 const router = express.Router();
 
 router.get("/alerts", isUserAuthenticated, getAllAlerts);
 router.patch("/alerts/:id/read", isUserAuthenticated, markAsRead)
+router.patch("/alerts/read-all", markAllAsRead)
+router.delete("/alerts/:id", deleteMsg)
+
 
 export default router;
 
