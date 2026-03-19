@@ -4,22 +4,26 @@ import { Alert } from "../models/alertSchema.js";
 import ErrorHandler from "../middlewares/error.js";
 
 export const getAllAlerts = catchAsyncError(async (req, res, next) => {
-  const allAlerts = await Alert.find({}).limit(20);
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
 
-  if (allAlerts.length <= 0) {
-    return next(new ErrorHandler("No messages Yet!", 400));
-  }
-
-  // allAlerts.map((alert) => {
-  //   const formatted = dayjs(alert.createdAt).format("DD MM, YYYY h:mm A");
-  //   console.log(formatted);
-  //   return formatted;
-  // });
+  const totalAlerts = await Alert.countDocuments();
+  const allAlerts = await Alert.find({})
+    .sort({ createdAt: -1 }) 
+    .limit(limit)
+    .skip(skip);
 
   res.status(200).json({
     success: true,
-    message: "All alerts fetch succesfully!",
+    message: "Alerts fetched successfully!",
     data: allAlerts,
+    pagination: {
+      totalAlerts,
+      totalPages: Math.ceil(totalAlerts / limit),
+      currentPage: page,
+      limit,
+    },
   });
 });
 
@@ -66,7 +70,6 @@ export const deleteMsg = catchAsyncError(async (req, res, next) => {
   const { id } = req.params;
 
   const getMsgToDelete = await Alert.findById(id);
-  console.log(getMsgToDelete);
 
   if (!getMsgToDelete) {
     return next(new ErrorHandler("Message did not found!", 400));
